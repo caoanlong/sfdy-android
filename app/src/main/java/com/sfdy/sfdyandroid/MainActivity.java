@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         mWebView.setWebChromeClient(new OpenFileChromeClient());
 
         String url = "https://jyavs.com";
-//        String url = "file:///android_asset/dcbox/index.html";
         mWebView.loadUrl(url);
     }
 
