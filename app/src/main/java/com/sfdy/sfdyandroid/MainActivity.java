@@ -18,6 +18,11 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
+import com.githang.statusbar.StatusBarCompat;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends AppCompatActivity {
     /** Android 5.0以下版本的文件选择回调 */
     protected ValueCallback<Uri> mFileUploadCallbackFirst;
@@ -33,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StatusBarCompat.setStatusBarColor(this, 0xFF6200EE, false);
         setContentView(R.layout.activity_main);
-//        StatusBarCompat.setStatusBarColor(this, 0x000000);
         this.createWebView();
     }
 
@@ -43,9 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         mWebView = findViewById(R.id.webview);
 
-        if(WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
-            WebSettingsCompat.setForceDark(mWebView.getSettings(), WebSettingsCompat.FORCE_DARK_ON);
-        }
+
 
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setDomStorageEnabled(true);
@@ -97,13 +100,22 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(newProgress);
             // 如果webview页面加载完成
             if (newProgress == 100) {
-                FrameLayout viewRoot = findViewById(R.id.mainview);
-                View splashpage = viewRoot.findViewById(R.id.splashview);
 
+                // 深色模式的值为0x21 - 33, 浅色模式的值为0x11 - 17
+                if (getApplicationContext().getResources().getConfiguration().uiMode == 33) {
+                    StatusBarCompat.setStatusBarColor(MainActivity.this, 0xff111111, false);
+                    if(WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                        WebSettingsCompat.setForceDark(mWebView.getSettings(), WebSettingsCompat.FORCE_DARK_ON);
+                    }
+                } else {
+                    StatusBarCompat.setStatusBarColor(MainActivity.this, 0xffffffff, true);
+                }
+
+                View splashpage = findViewById(R.id.splashview);
                 splashpage.animate().alpha(0f).setDuration(1500).setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        viewRoot.removeView(splashpage);
+                        splashpage.setVisibility(View.GONE);
                     }
                 });
             }

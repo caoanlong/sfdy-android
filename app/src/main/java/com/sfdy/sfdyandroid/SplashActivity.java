@@ -2,11 +2,14 @@ package com.sfdy.sfdyandroid;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.webkit.WebSettingsCompat;
+import androidx.webkit.WebViewFeature;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.githang.statusbar.StatusBarCompat;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sfdy.sfdyandroid.model.AppVersion;
@@ -72,7 +75,12 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StatusBarCompat.setStatusBarColor(this, 0xFF6200EE, false);
         setContentView(R.layout.activity_splash);
         checkVersion();
+        int uiMode = getApplicationContext().getResources().getConfiguration().uiMode;
+        // 深色模式的值为0x21 - 33
+        // 浅色模式的值为0x11 - 17
+        System.out.println("uiMode:" + uiMode);
     }
 }
