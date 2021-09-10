@@ -4,15 +4,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.webkit.WebSettingsCompat;
 import androidx.webkit.WebViewFeature;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 
 public class MainActivity extends AppCompatActivity {
     /** Android 5.0以下版本的文件选择回调 */
@@ -85,6 +89,23 @@ public class MainActivity extends AppCompatActivity {
             }
             else {
                 return false;
+            }
+        }
+
+        @Override
+        public void onProgressChanged(WebView view, int newProgress) {
+            System.out.println(newProgress);
+            // 如果webview页面加载完成
+            if (newProgress == 100) {
+                FrameLayout viewRoot = findViewById(R.id.mainview);
+                View splashpage = viewRoot.findViewById(R.id.splashview);
+
+                splashpage.animate().alpha(0f).setDuration(1500).setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        viewRoot.removeView(splashpage);
+                    }
+                });
             }
         }
     }

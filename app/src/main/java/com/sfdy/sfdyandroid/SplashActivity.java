@@ -31,6 +31,7 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onError(Call call, Exception e, int id) {
                 startActivity(intent);
+                overridePendingTransition(0, 0); // 取消Activity跳转默认动画
             }
 
             @Override
@@ -51,13 +52,16 @@ public class SplashActivity extends AppCompatActivity {
                                 .setPositiveButton("确定", (dialog, which) -> {
                                     dialog.dismiss();
                                     startActivity(intent);
+                                    overridePendingTransition(0, 0);
                                 })
                                 .show();
                     } else {
                         startActivity(intent);
+                        overridePendingTransition(0, 0);
                     }
                 } else {
                     startActivity(intent);
+                    overridePendingTransition(0, 0);
                 }
             }
         });
