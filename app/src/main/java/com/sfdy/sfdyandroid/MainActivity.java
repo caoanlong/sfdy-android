@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -117,41 +118,23 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
         webSettings.setAllowFileAccess(true);
-        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
 
         webSettings.setAllowContentAccess(true);
         webSettings.setDefaultTextEncodingName("utf-8");
-        webSettings.setUserAgentString(ua + ";Native-android");
         // 确保跳转到另一个网页时仍然在当前 WebView 中显示
         // 而不是调用浏览器打开
         mWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
-            }
+//            @Override
+//            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//                view.loadUrl(url);
+//                return true;
+//            }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 // 如果webview页面加载完成
-                // 深色模式的值为0x21 - 33, 浅色模式的值为0x11 - 17
-                if (getApplicationContext().getResources().getConfiguration().uiMode == 33) {
-                    StatusBarCompat.setStatusBarColor(MainActivity.this, 0xff111111, false);
-                    if(WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
-                        WebSettingsCompat.setForceDark(mWebView.getSettings(), WebSettingsCompat.FORCE_DARK_ON);
-                    }
-                } else {
-                    StatusBarCompat.setStatusBarColor(MainActivity.this, 0xffffffff, true);
-                }
-                View screenContainer = findViewById(R.id.screen_container);
-                screenContainer.animate().alpha(0f).setDuration(1500).setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        screenContainer.setVisibility(View.GONE);
-                        getSupportFragmentManager().beginTransaction().remove(fragment).commit();
-                    }
-                });
+
             }
         });
         mWebView.setWebChromeClient(new OpenFileChromeClient());
@@ -204,7 +187,25 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(newProgress);
             // 如果webview页面加载完成
             if (newProgress == 100) {
-
+                // 深色模式的值为0x21 - 33, 浅色模式的值为0x11 - 17
+                if (getApplicationContext().getResources().getConfiguration().uiMode == 33) {
+                    StatusBarCompat.setStatusBarColor(MainActivity.this, 0xff111111, false);
+                    if(WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                        WebSettingsCompat.setForceDark(mWebView.getSettings(), WebSettingsCompat.FORCE_DARK_ON);
+                    }
+                } else {
+                    StatusBarCompat.setStatusBarColor(MainActivity.this, 0xffffffff, true);
+                }
+                View screenContainer = findViewById(R.id.screen_container);
+                if (screenContainer != null) {
+                    screenContainer.animate().alpha(0f).setDuration(1500).setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            screenContainer.setVisibility(View.GONE);
+                            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+                        }
+                    });
+                }
             }
         }
 
