@@ -1,6 +1,7 @@
 package com.sfdy.sfdyandroid;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.webkit.WebSettingsCompat;
 import androidx.webkit.WebViewFeature;
 
@@ -17,10 +18,14 @@ import android.view.View;
 import android.view.WindowManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.githang.statusbar.StatusBarCompat;
+import com.sfdy.sfdyandroid.fragment.ScreenFragment;
+import com.sfdy.sfdyandroid.utils.APKVersionInfoUtils;
+import com.xuexiang.xupdate.XUpdate;
 
 public class MainActivity extends AppCompatActivity {
     private WindowManager windowManager;
@@ -34,22 +39,33 @@ public class MainActivity extends AppCompatActivity {
 
     protected String mUploadableFileTypes = "image/*";
 
-    private View splashpage;
+    private Fragment fragment;
+
     private WebView mWebView;
 
     private View fullScreenView = null;
 
     private String URL = "https://jyavs.com";
+//    private String URL = "http://localhost:3000";
+
+    private final String mUpdateUrl = "https://jyavs.com/app/common/check/1/1/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
         StatusBarCompat.setStatusBarColor(this, 0xFF6200EE, false);
         setContentView(R.layout.activity_main);
+        fragment = ScreenFragment.newInstance();
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.main_container, fragment).commit();
+        }
+        XUpdate.newBuild(this)
+                .updateUrl(mUpdateUrl + APKVersionInfoUtils.getVersionName(this))
+                .update();
+
         windowManager = getWindowManager();
-        splashpage = findViewById(R.id.splashview);
         this.createWebView();
     }
 
@@ -93,11 +109,19 @@ public class MainActivity extends AppCompatActivity {
     private void createWebView() {
 
         mWebView = findViewById(R.id.webview);
+        WebSettings webSettings = mWebView.getSettings();
+        String ua = webSettings.getUserAgentString();
 
-        mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.getSettings().setDomStorageEnabled(true);
-        mWebView.getSettings().setAllowFileAccess(true);
-        mWebView.getSettings().setDefaultTextEncodingName("utf-8");
+        webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setAllowFileAccess(true);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+
+        webSettings.setAllowContentAccess(true);
+        webSettings.setDefaultTextEncodingName("utf-8");
+        webSettings.setUserAgentString(ua + ";Native-android");
         // 确保跳转到另一个网页时仍然在当前 WebView 中显示
         // 而不是调用浏览器打开
         mWebView.setWebViewClient(new WebViewClient() {
@@ -120,11 +144,12 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     StatusBarCompat.setStatusBarColor(MainActivity.this, 0xffffffff, true);
                 }
-
-                splashpage.animate().alpha(0f).setDuration(1500).setListener(new AnimatorListenerAdapter() {
+                View screenContainer = findViewById(R.id.screen_container);
+                screenContainer.animate().alpha(0f).setDuration(1500).setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        splashpage.setVisibility(View.GONE);
+                        screenContainer.setVisibility(View.GONE);
+                        getSupportFragmentManager().beginTransaction().remove(fragment).commit();
                     }
                 });
             }

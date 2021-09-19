@@ -17,8 +17,8 @@ public class SfdyApp extends Application {
         super.onCreate();
         // Set listening for version update errors
         XUpdate.get()
-                .debug(true)
-                .isWifiOnly(true)                                               // By default, only version updates are checked under WiFi
+                .debug(false)
+                .isWifiOnly(false)                                               // By default, only version updates are checked under WiFi
                 .isGet(true)                                                    // The default setting uses Get request to check versions
                 .isAutoMode(false)                                              // The default setting is non automatic mode
                 .param("versionCode", APKVersionInfoUtils.getVersionCode(this))         // Set default public request parameters
